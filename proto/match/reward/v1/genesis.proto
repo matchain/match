@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package match.reward.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/matchain/match/x/reward/types";
+
+// Params defines the reward module parameters
+message Params {
+  bool enable = 1;
+  // base defines ratio for gas rewards.
+  string base = 2
+  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  string validator = 3
+  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+}
+
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

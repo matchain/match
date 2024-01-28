@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package match.reward.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/matchain/match/x/reward/types";
+
+message Reward {
+  string contract_address = 1;
+  string deployer_address = 2;
+}
