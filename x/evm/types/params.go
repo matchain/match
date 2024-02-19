@@ -35,7 +35,11 @@ var (
 	// DefaultEnableCreate enables contract creation (i.e true)
 	DefaultEnableCreate = true
 	// DefaultEnableCall enables contract calls (i.e true)
-	DefaultEnableCall = true
+	DefaultEnableCall    = true
+	DefaultEVMExtensions = []string{
+		"0x6980000000000000000000000000000000000000", // Staking precompile
+		"0x6980000000000000000000000000000000000001", // Distribution precompile
+	}
 )
 
 // AvailableExtraEIPs define the list of all EIPs that can be enabled by the

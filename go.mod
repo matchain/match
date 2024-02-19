@@ -2,8 +2,6 @@ module github.com/matchain/match
 
 go 1.21
 
-toolchain go1.21.5
-
 require (
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.0-rc.0
@@ -217,7 +215,7 @@ require (
 replace (
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	// use cometbft-db
+	// use cometbft-db for pebbledb
 	github.com/cometbft/cometbft-db => github.com/notional-labs/cometbft-db v0.0.0-20240107093658-ef2dfbbb7a75
 	// use Evmos geth fork
 	github.com/ethereum/go-ethereum => github.com/evmos/go-ethereum v1.10.26
