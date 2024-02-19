@@ -73,6 +73,9 @@ type Keeper struct {
 	hooks types.EvmHooks
 	// Legacy subspace
 	ss paramstypes.Subspace
+
+	// extensions defined the map of all available precompiled contracts.
+	extensions map[common.Address]vm.PrecompiledContract
 }
 
 // NewKeeper generates new evm module keeper
