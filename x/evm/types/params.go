@@ -71,6 +71,7 @@ func DefaultParams() Params {
 		ChainConfig:         DefaultChainConfig(),
 		ExtraEIPs:           nil,
 		AllowUnprotectedTxs: DefaultAllowUnprotectedTxs,
+		EvmExtensions:       DefaultEVMExtensions,
 	}
 }
 
