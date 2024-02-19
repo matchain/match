@@ -37,8 +37,8 @@ func (suite *KeeperTestSuite) TestWithChainID() {
 		},
 		{
 			"success - Match mainnet chain ID",
-			"match_9001-2",
-			9001,
+			"match_699-2",
+			699,
 			false,
 		},
 		{
