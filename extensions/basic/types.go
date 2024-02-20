@@ -20,3 +20,8 @@ import "time"
 var (
 	DefaultExpirationDuration = time.Hour * 24 * 365
 )
+
+// errors
+const (
+	ErrNotInEvm = "not in EVM"
+)

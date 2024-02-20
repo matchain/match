@@ -23,6 +23,7 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/vm"
 
 	"github.com/matchain/match/extensions/basic"
 )
@@ -82,9 +83,26 @@ func (extension *Extension) RequiredGas(input []byte) uint64 {
 }
 
 // todo
-func (extension *Extension) Run(input []byte) ([]byte, error) {
-	//TODO implement me
-	panic("implement me")
+func (extension *Extension) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) ([]byte, error) {
+	ctx, stateDB, method, initialGas, args, err := extension.Setup(evm, contract, readOnly, extension.isTransaction)
+	if err != nil {
+		return nil, err
+	}
+	defer basic.HandleGasError(ctx, contract, initialGas, &err)()
+
+	if err := stateDB.Commit(); err != nil {
+		return nil, err
+	}
+
+	_ = method
+	_ = args
+
+	cost := ctx.GasMeter().GasConsumed()
+	if !contract.UseGas(cost) {
+		return nil, vm.ErrOutOfGas
+	}
+
+	return nil, nil
 }
 
 // isTransaction returns if given method is valid.
