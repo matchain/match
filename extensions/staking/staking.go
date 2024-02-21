@@ -19,11 +19,13 @@ import (
 	"embed"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/matchain/match/extensions/basic"
 )
@@ -94,15 +96,22 @@ func (extension *Extension) Run(evm *vm.EVM, contract *vm.Contract, readOnly boo
 		return nil, err
 	}
 
-	_ = method
-	_ = args
+	var bz []byte
+	switch method.Name {
+	case DelegateMethod:
+		bz, err = extension.Delegate(ctx, evm.Origin, contract, stateDB, method, args)
+	}
+
+	if err != nil {
+		return nil, err
+	}
 
 	cost := ctx.GasMeter().GasConsumed()
 	if !contract.UseGas(cost) {
 		return nil, vm.ErrOutOfGas
 	}
 
-	return nil, nil
+	return bz, nil
 }
 
 // isTransaction returns if given method is valid.
@@ -120,4 +129,8 @@ func (*Extension) isTransaction(method string) bool {
 	default:
 		return false
 	}
+}
+
+func (extension *Extension) Logger(ctx sdk.Context) log.Logger {
+	return ctx.Logger().With("evm extension", "staking")
 }

@@ -23,5 +23,7 @@ var (
 
 // errors
 const (
-	ErrNotInEvm = "not in EVM"
+	ErrNotInEvm      = "not in EVM"
+	ErrInvalidArgs   = "invalid arguments"
+	ErrInvalidAmount = "invalid amount"
 )

@@ -19,8 +19,13 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"math/big"
+	"reflect"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/math"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func LoadAbi(fs embed.FS, path string) (abi.ABI, error) {
@@ -35,4 +40,85 @@ func LoadAbi(fs embed.FS, path string) (abi.ABI, error) {
 	}
 
 	return newAbi, nil
+}
+
+func PackNumber(value reflect.Value) []byte {
+	switch kind := value.Kind(); kind {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return math.U256Bytes(new(big.Int).SetUint64(value.Uint()))
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return math.U256Bytes(big.NewInt(value.Int()))
+	case reflect.Ptr:
+		return math.U256Bytes(new(big.Int).Set(value.Interface().(*big.Int)))
+	default:
+		panic("abi: invalid number type")
+	}
+}
+
+func genIntType(value int64, size uint) []byte {
+	var topic [common.HashLength]byte
+	if value < 0 {
+		topic = [common.HashLength]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}
+	}
+	for i := uint(0); i < size; i++ {
+		topic[common.HashLength-i-1] = byte(value >> (i * 8))
+	}
+	return topic[:]
+}
+
+func MakeTopic(value interface{}) (common.Hash, error) {
+	var topic common.Hash
+
+	// Try to generate the topic based on simple types
+	switch value := value.(type) {
+	case common.Hash:
+		copy(topic[:], value[:])
+	case common.Address:
+		copy(topic[common.HashLength-common.AddressLength:], value[:])
+	case *big.Int:
+		blob := value.Bytes()
+		copy(topic[common.HashLength-len(blob):], blob)
+	case bool:
+		if value {
+			topic[common.HashLength-1] = 1
+		}
+	case int8:
+		copy(topic[:], genIntType(int64(value), 1))
+	case int16:
+		copy(topic[:], genIntType(int64(value), 2))
+	case int32:
+		copy(topic[:], genIntType(int64(value), 4))
+	case int64:
+		copy(topic[:], genIntType(value, 8))
+	case uint8:
+		blob := new(big.Int).SetUint64(uint64(value)).Bytes()
+		copy(topic[common.HashLength-len(blob):], blob)
+	case uint16:
+		blob := new(big.Int).SetUint64(uint64(value)).Bytes()
+		copy(topic[common.HashLength-len(blob):], blob)
+	case uint32:
+		blob := new(big.Int).SetUint64(uint64(value)).Bytes()
+		copy(topic[common.HashLength-len(blob):], blob)
+	case uint64:
+		blob := new(big.Int).SetUint64(value).Bytes()
+		copy(topic[common.HashLength-len(blob):], blob)
+	case string:
+		hash := crypto.Keccak256Hash([]byte(value))
+		copy(topic[:], hash[:])
+	case []byte:
+		hash := crypto.Keccak256Hash(value)
+		copy(topic[:], hash[:])
+
+	default:
+		val := reflect.ValueOf(value)
+		switch {
+		// static byte array
+		case val.Kind() == reflect.Array && reflect.TypeOf(value).Elem().Kind() == reflect.Uint8:
+			reflect.Copy(reflect.ValueOf(topic[:val.Len()]), val)
+		default:
+			return topic, fmt.Errorf("unsupported indexed type: %T", value)
+		}
+	}
+
+	return topic, nil
 }
