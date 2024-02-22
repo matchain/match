@@ -59,3 +59,8 @@ func (k *Keeper) WithExtensions(extensions map[common.Address]vm.PrecompiledCont
 	k.extensions = extensions
 	return k
 }
+
+// Extensions returns available extensions.
+func (k *Keeper) Extensions() map[common.Address]vm.PrecompiledContract {
+	return k.extensions
+}

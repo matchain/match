@@ -332,7 +332,15 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 	evm := k.NewEVM(ctx, msg, cfg, tracer, stateDB)
 
 	if len(cfg.Params.EvmExtensions) != 0 {
+		customExtensions := cfg.Params.ActiveExtensionsAddrs()
 
+		extensionsBerlin := vm.PrecompiledAddressesBerlin
+		activeExtensions := make([]common.Address, len(extensionsBerlin)+len(customExtensions))
+		copy(activeExtensions[:len(extensionsBerlin)], extensionsBerlin)
+		copy(activeExtensions[len(extensionsBerlin):], customExtensions)
+
+		extensionMap := k.Extensions()
+		evm.WithPrecompiles(extensionMap, activeExtensions)
 	}
 
 	leftoverGas := msg.Gas()
