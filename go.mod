@@ -218,7 +218,7 @@ replace (
 	// use cometbft-db for pebbledb
 	github.com/cometbft/cometbft-db => github.com/notional-labs/cometbft-db v0.0.0-20240107093658-ef2dfbbb7a75
 	// use Evmos geth fork
-	github.com/ethereum/go-ethereum => github.com/evmos/go-ethereum v1.10.26
+	github.com/ethereum/go-ethereum => github.com/evmos/go-ethereum v1.10.26-evmos-rc2
 	// Security Advisory https://github.com/advisories/GHSA-h395-qcrw-5vmq
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.7
 	// use cosmos flavored protobufs
