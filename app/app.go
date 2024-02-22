@@ -417,6 +417,7 @@ func NewMatch(
 
 	// Match Keeper
 	app.EvmKeeper = app.EvmKeeper.SetHooks(evmkeeper.NewMultiEvmHooks())
+	app.EvmKeeper = app.EvmKeeper.WithExtensions(evmkeeper.AvailableExtensions(app.StakingKeeper, app.DistrKeeper, app.AuthzKeeper))
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
