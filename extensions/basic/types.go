@@ -15,7 +15,15 @@
 // along with the Match packages. If not, see https://github.com/matchain/match/blob/main/LICENSE
 package basic
 
-import "time"
+import (
+	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+)
+
+var (
+	ZeroAddress = common.Address{}
+)
 
 var (
 	DefaultExpirationDuration = time.Hour * 24 * 365

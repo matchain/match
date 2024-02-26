@@ -25,6 +25,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/vm"
 
+	distributionextension "github.com/matchain/match/extensions/distribution"
 	stakingextension "github.com/matchain/match/extensions/staking"
 )
 
@@ -40,7 +41,13 @@ func AvailableExtensions(
 		panic(fmt.Errorf("failed to load staking extension %v", err))
 	}
 
+	distributionExtension, err := distributionextension.NewExtension(distributionKeeper, stakingKeeper, authzKeeper)
+	if err != nil {
+		panic(fmt.Errorf("failed to load distribuiton extension %v", err))
+	}
+
 	extensions[stakingExtension.Address()] = stakingExtension
+	extensions[distributionExtension.Address()] = distributionExtension
 
 	return extensions
 }

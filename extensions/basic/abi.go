@@ -22,6 +22,7 @@ import (
 	"math/big"
 	"reflect"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -121,4 +122,20 @@ func MakeTopic(value interface{}) (common.Hash, error) {
 	}
 
 	return topic, nil
+}
+
+type Coin struct {
+	Denom  string
+	Amount *big.Int
+}
+
+func NewCoinsResponse(amount sdk.Coins) []Coin {
+	outputs := make([]Coin, len(amount))
+	for i, coin := range amount {
+		outputs[i] = Coin{
+			Denom:  coin.Denom,
+			Amount: coin.Amount.BigInt(),
+		}
+	}
+	return outputs
 }
