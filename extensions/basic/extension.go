@@ -49,15 +49,15 @@ func (extension *Extension) RequiredGas(input []byte, isTransaction bool) uint64
 func (extension *Extension) Setup(
 	evm *vm.EVM, contract *vm.Contract,
 	readOnly bool, isTransaction func(name string) bool,
-) (sdk.Context, *statedb.StateDB, *abi.Method, sdk.Gas, []interface{}, error) {
+) (ctx sdk.Context, stateDB *statedb.StateDB, method *abi.Method, initialGas sdk.Gas, args []interface{}, err error) {
 	stateDB, ok := evm.StateDB.(*statedb.StateDB)
 	if !ok {
 		return sdk.Context{}, nil, nil, 0, nil, fmt.Errorf(ErrNotInEvm)
 	}
-	ctx := stateDB.GetContext()
+	ctx = stateDB.GetContext()
 
 	methodId := contract.Input[:4]
-	method, err := extension.MethodById(methodId)
+	method, err = extension.MethodById(methodId)
 	if err != nil {
 		return sdk.Context{}, nil, nil, 0, nil, err
 	}
@@ -67,12 +67,12 @@ func (extension *Extension) Setup(
 	}
 
 	argsBz := contract.Input[4:]
-	args, err := method.Inputs.Unpack(argsBz)
+	args, err = method.Inputs.Unpack(argsBz)
 	if err != nil {
 		return sdk.Context{}, nil, nil, 0, nil, err
 	}
 
-	initialGas := ctx.GasMeter().GasConsumed()
+	initialGas = ctx.GasMeter().GasConsumed()
 	defer HandleGasError(ctx, contract, initialGas, &err)()
 
 	ctx = ctx.WithGasMeter(sdk.NewGasMeter(contract.Gas)).

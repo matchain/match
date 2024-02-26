@@ -85,7 +85,7 @@ func (extension *Extension) RequiredGas(input []byte) uint64 {
 }
 
 // todo
-func (extension *Extension) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) ([]byte, error) {
+func (extension *Extension) Run(evm *vm.EVM, contract *vm.Contract, readOnly bool) (bz []byte, err error) {
 	ctx, stateDB, method, initialGas, args, err := extension.Setup(evm, contract, readOnly, extension.isTransaction)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,6 @@ func (extension *Extension) Run(evm *vm.EVM, contract *vm.Contract, readOnly boo
 		return nil, err
 	}
 
-	var bz []byte
 	switch method.Name {
 	case DelegateMethod:
 		bz, err = extension.Delegate(ctx, evm.Origin, contract, stateDB, method, args)
